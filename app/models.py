@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import Column, ForeignKey, Integer, String,Boolean,TIMESTAMP
+from sqlalchemy import Column, ForeignKey, Integer, String,Boolean,TIMESTAMP,Double
 from .database import Base
 from sqlalchemy.orm import relationship
 
@@ -8,7 +8,7 @@ class User(Base):
     __tablename__="users"
     id=Column(Integer,primary_key=True,nullable=False)
     name=Column(String,nullable=False)
-    phoneNumber=Column(String,nullable=False,unique=True)
+    phoneNumber=Column(String,nullable=False)
     email=Column(String,nullable=False)
     password=Column(String,nullable=False)
     books=relationship("Book",back_populates="user")
@@ -23,13 +23,14 @@ class Book(Base):
     description=Column(String,nullable=False)
     rental_period=Column(Integer,nullable=False)
     rental_price=Column(Integer,nullable=False)
-    avalability=Column(Boolean,nullable=False,default=True)
+    availability=Column(Boolean,nullable=False,default=True)
     user_id=Column(Integer,ForeignKey("users.id"))
     user=relationship("User",back_populates="books")
     reviews=relationship("Review",back_populates="book")
     carts=relationship("Cart",back_populates="book")
     authors=relationship("Author",secondary="association_book_author",back_populates="books")
     genres=relationship("Genre",secondary="association_book_genre",back_populates="books")
+    rental_histories=relationship("RentalHistory",back_populates="book")
     
 
 class Review(Base):
@@ -77,10 +78,11 @@ class Genre(Base):
 class RentalHistory(Base):
     __tablename__="rental_histories"
     id=Column(Integer,primary_key=True,nullable=False)
-    amount=Column(Integer,nullable=False)
+    amount=Column(Double,nullable=False)
     status=Column(Boolean,nullable=False,default=True)
     rented_on=Column(TIMESTAMP(timezone=True),nullable=True,default="now()")
     rental_period=Column(Integer,nullable=False)
-    book_id=Column(Integer,nullable=False)
-    user_id=Column(Integer,ForeignKey("users.id"))
+    book_id=Column(Integer,ForeignKey("books.id"),nullable=False)
+    book=relationship("Book",back_populates="rental_histories")
+    user_id=Column(Integer,ForeignKey("users.id"),nullable=False)
     user=relationship("User",back_populates="rental_histories")
