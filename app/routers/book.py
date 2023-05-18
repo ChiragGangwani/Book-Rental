@@ -1,9 +1,8 @@
 from fastapi import Response,status,HTTPException,Depends,APIRouter
-from typing import List
+from typing import List,Optional
 from .. import models,schemas,util,oauth2
 from ..database import get_db
 from sqlalchemy.orm import Session
-
 
 router=APIRouter(
     prefix="/books",
@@ -36,10 +35,13 @@ async def add_book(book:schemas.BookAdd,db: Session = Depends(get_db),current_us
     return new_book
 
 @router.get("/list",response_model=List[schemas.BookBase])
-async def get_books_list(db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
-    books=db.query(models.Book).all()
+async def get_books_list(title:Optional[str]="",author:Optional[str]="",genre:Optional[str]="",db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
+
+    books=db.query(models.Book).join(models.AssociationBookAuthor,models.AssociationBookAuthor.book_id==models.Book.id,isouter=True).join(models.Author,models.Author.id==models.AssociationBookAuthor.author_id).join(models.AssociationBookGenre,models.AssociationBookGenre.book_id==models.Book.id,isouter=True).join(models.Genre,models.Genre.id==models.AssociationBookGenre.genre_id).filter(models.Book.title.contains(title),models.Author.name.contains(author),models.Genre.name.contains(genre)).all()
+   
     if books.__len__()==0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No book exists")
+    
     return books
 
 

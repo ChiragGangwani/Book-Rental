@@ -3,7 +3,7 @@ from typing import List
 from . import models,schemas,util
 from .database import engine,get_db
 from sqlalchemy.orm import Session
-from . routers import user,auth,book,author,genre,review,cart,rent_history
+from . routers import rental_history, user,auth,book,author,genre,review,cart
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -16,7 +16,7 @@ app.include_router(author.router)
 app.include_router(genre.router)
 app.include_router(review.router)
 app.include_router(cart.router)
-app.include_router(rent_history.router)
+app.include_router(rental_history.router)
 
 # while True:
 #     try:
