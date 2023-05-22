@@ -1,12 +1,15 @@
 from fastapi import FastAPI
 from . routers import rental_history, user,auth,book,author,genre,review,cart
 from fastapi.middleware.cors import CORSMiddleware
+from jobs.my_jobs import scheduler
 
 # models.Base.metadata.craleate_all(bind=engine)
 
 origins = ["*"]
 
 app = FastAPI()
+
+scheduler.start()
 
 app.add_middleware(
     CORSMiddleware,

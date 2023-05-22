@@ -81,6 +81,7 @@ class RentalHistory(Base):
     amount=Column(Double,nullable=False)
     status=Column(Boolean,nullable=False,default=True)
     rented_on=Column(TIMESTAMP(timezone=True),nullable=True,default="now()")
+    return_on=Column(TIMESTAMP(timezone=True),nullable=True)
     rental_period=Column(Integer,nullable=False)
     book_id=Column(Integer,ForeignKey("books.id"),nullable=False)
     book=relationship("Book",back_populates="rental_histories")

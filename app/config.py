@@ -14,3 +14,15 @@ class Settings(BaseSettings):
         env_file=".env"
 
 settings=Settings()
+
+class Credidentials(BaseSettings):
+    MAIL_USERNAME:str
+    MAIL_PASSWORD:str
+    MAIL_FROM:str
+    MAIL_SERVER:str
+    MAIL_PORT:int
+
+    class Config:
+        env_file=".env"
+
+credidentials=Credidentials()

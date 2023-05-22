@@ -1,9 +1,10 @@
+from datetime import timedelta
 from fastapi import Response,status,HTTPException,Depends,APIRouter
 from typing import List
 from .. import models,schemas,util,oauth2
 from ..database import get_db
 from sqlalchemy.orm import Session
-
+from ..notification import send_email
 
 router=APIRouter(
     prefix="/carts",
@@ -12,7 +13,7 @@ router=APIRouter(
 
 @router.post("/",status_code=status.HTTP_201_CREATED)
 async def add_to_cart(cart:schemas.Cart,db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
-    book=db.query(models.Book).filter(models.Book.id==cart.book_id,models.Book.avalability==True).first()
+    book=db.query(models.Book).filter(models.Book.id==cart.book_id,models.Book.availability==True).first()
     already_cart=db.query(models.Cart).filter(models.Cart.book_id==cart.book_id).first()
     if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Book not available with id {cart.book_id}")
@@ -49,14 +50,21 @@ async def cart_checkout(db: Session = Depends(get_db),current_user=Depends(oauth
     payment=0
     for cart in carts:
         book=db.query(models.Book).filter(models.Book.id==cart.book_id).first()
-        if book.avalability==False or not book:
-               raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Book not available with id {cart.book_id} kindly delete this book")
-        book.user_id=current_user.id
-        book.avalability=False
-        rental=models.RentalHistory(amount=book.rental_price*cart.rental_period,book_id=book.id,user_id=current_user.id,rental_period=cart.rental_period)
-        db.add(rental)
-        db.commit()
-        payment+=book.rental_price*cart.rental_period
-    db.query(models.Cart).filter(models.Cart.user_id==current_user.id).delete()
-    db.commit()
+        if book.availability==False:
+               current_user=db.query(models.RentalHistory).filter(models.RentalHistory.book_id==book.id,models.RentalHistory.user_id==book.user_id,models.RentalHistory.status==True).first()
+               if current_user!=None:
+                available=str(current_user.rented_on+timedelta(days=current_user.rental_period))
+                await send_email(["chirag.sgrl2001@gmail.com"],f"Book {book.title} and id {book.id} is not available right now it will available by {available[0:10]}.  \n\nThanks\nChirag Gangwani\nSleevesUp Book Store","Book not available")
+    for cart in carts:
+        if book and book.availability==True:
+            book.user_id=current_user.id
+            book.availability=False
+            rental=models.RentalHistory(amount=book.rental_price*cart.rental_period,book_id=book.id,user_id=current_user.id,rental_period=cart.rental_period)
+            db.add(rental)
+            db.commit()
+            payment+=book.rental_price*cart.rental_period
+            db.query(models.Cart).filter(models.Cart.id==cart.id).delete()
+            db.commit()
+    if payment==0:
+        return f"No Book Available please check your email for more information"
     return f"Order successfully placed and total payment is {payment}"

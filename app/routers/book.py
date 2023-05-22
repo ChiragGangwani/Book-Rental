@@ -57,7 +57,7 @@ async def delete_book(id:int,db: Session = Depends(get_db),current_user=Depends(
     book=db.query(models.Book).filter(models.Book.id==id).first()
     if not book:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Book with id {id} not exists")
-    if book.avalability==False:
+    if book.availability==False:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Book with id {id} is issued to user {book.user_id}")
     db.delete(book)
     db.commit()
@@ -86,7 +86,7 @@ async def update_book(id:int,book:schemas.BookUpdate,db: Session = Depends(get_d
         else:
             genres.append(genre)
 
-    exist_book.avalability=book.availabilty
+    exist_book.availability=book.availability
     exist_book.authors=authors
     exist_book.genres=genres
     exist_book.title=book.title

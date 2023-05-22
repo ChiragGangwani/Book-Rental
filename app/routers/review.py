@@ -41,7 +41,7 @@ async def add_review(id:int,db: Session = Depends(get_db),current_user=Depends(o
 
 
 @router.put("/{id}",response_model=schemas.ReviewBase)
-async def add_review(id:int,new_review:schemas.ReviewUpdate,db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
+async def update_review(id:int,new_review:schemas.ReviewUpdate,db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
 
     review=db.query(models.Review).filter(models.Review.id==id).first()
     if not review:

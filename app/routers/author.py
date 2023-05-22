@@ -25,7 +25,7 @@ async def get_authors_list(db: Session = Depends(get_db),current_user=Depends(oa
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No author exists")
     return authors
 
-@router.get("/{id}",status_code=status.HTTP_201_CREATED,response_model=schemas.AuthorGet)
+@router.get("/{id}",response_model=schemas.AuthorGet)
 async def get_author(id:int,db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
      author=db.query(models.Author).filter(models.Author.id==id).first()
      if not author:

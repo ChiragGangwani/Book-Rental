@@ -89,7 +89,7 @@ class BookGet(BookBase):
         orm_mode = True
 
 class BookUpdate(BookAdd):
-    availabilty:bool
+    availability:bool
 
 class Review(BaseModel):
     review:str
@@ -108,3 +108,6 @@ class RentHistory(BaseModel):
     amount:int
     status:bool
     book_id:int
+
+class email(BaseModel):
+    List[str]

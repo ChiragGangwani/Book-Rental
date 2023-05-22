@@ -25,7 +25,7 @@ async def get_genres_list(db: Session = Depends(get_db),current_user=Depends(oau
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No genre exists")
     return genres
 
-@router.get("/{id}",status_code=status.HTTP_201_CREATED,response_model=schemas.GenreGet)
+@router.get("/{id}",response_model=schemas.GenreGet)
 async def get_genre(id:int,db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
      genre=db.query(models.Genre).filter(models.Genre.id==id).first()
      if not genre:

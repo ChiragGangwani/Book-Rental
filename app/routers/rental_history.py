@@ -15,7 +15,7 @@ async def get_all_history(db: Session = Depends(get_db),current_user=Depends(oau
     histories=db.query(models.RentalHistory).all()
 
     if histories.__len__()==0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"No rental history")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="No rental history")
     
     return histories
 
