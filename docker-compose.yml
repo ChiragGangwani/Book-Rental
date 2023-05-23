@@ -3,7 +3,7 @@ services:
   api:
     image: chiraggangwani/book-rental
     ports:
-      - 80:8000
+      - 8000:8000
     environment:
       - DATABASE_HOSTNAME=${DATABASE_HOSTNAME}
       - DATABASE_PORT=${DATABASE_PORT}
@@ -15,8 +15,17 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
     depends_on:
       - postgres
-    # volumes:
-    #   - ./:usr/src/app:ro
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./key.pem:/root/ssl/key.pem
+      - ./cert.pem:/root/ssl/cert.pem
+    ports:
+      - "443:443"
+    depends_on:
+      - api
 
   postgres:
     image: postgres
