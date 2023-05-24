@@ -62,16 +62,18 @@ jobs:
           pytest
   Deploy:
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2 
-      - name: Deploy in EC2
-      environment:
-      name: deploy
+    environment:
+           name: deploy
         env:
             PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
             HOSTNAME : ${{ secrets.HOSTNAME  }}
             USER_NAME : ${{ secrets.USER_NAME  }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: pulling git repo
+        uses: actions/checkout@v2 
+      - name: Deploy in EC2
+        
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
