@@ -35,7 +35,7 @@ async def add_user(user:schemas.UserCreate,db: Session = Depends(get_db)):
 
     return new_user
 
-@router.get("/list",response_model=List[schemas.UserResponse])
+@router.get("/listttttttttttttt",response_model=List[schemas.UserResponse])
 async def get_user_list(db: Session = Depends(get_db),current_user=Depends(oauth2.get_current_user)):
     users=db.query(models.User).all()
     return users
