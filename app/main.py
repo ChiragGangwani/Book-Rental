@@ -28,16 +28,6 @@ app.include_router(review.router)
 app.include_router(cart.router)
 app.include_router(rental_history.router)
 
-# while True:
-#     try:
-#         conn=psycopg2.connect(host='localhost',database='bookRental',user='postgres',password='postgres',cursor_factory=RealDictCursor)
-#         cursor=conn.cursor()
-#         print("Database connected successfully")
-#         break
-#     except Exception as error:
-#         print("Database connection failed")
-#         print("Error = ", error)
-#         time.sleep(2)
 
 
 
