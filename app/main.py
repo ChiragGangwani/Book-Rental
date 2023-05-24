@@ -9,7 +9,6 @@ origins = ["*"]
 
 app = FastAPI()
 
-
 scheduler.start()
 
 app.add_middleware(
