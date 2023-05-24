@@ -9,6 +9,12 @@ origins = ["*"]
 
 app = FastAPI()
 
+app.get('/')
+def test():
+    return "Hello World"
+
+
+
 scheduler.start()
 
 app.add_middleware(
