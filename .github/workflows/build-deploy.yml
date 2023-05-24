@@ -68,12 +68,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-            host : ${{ secrets.EC2_HOST_NAME  }}
-            username : ${{ secrets.EC2_USER_NAME  }}
-            key: ${{ secrets.EC2_ACCESS_PRIVATE_KEY  }}
-            password: ""
-            script: |
-             cd BookRental
+      - name: Build & Deploy
+        env:
+            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY }}
+            HOSTNAME: ${{secrets.HOSTNAME}}
+            USER_NAME: ${secrets.USER_NAME}
+        run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
