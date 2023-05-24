@@ -3,85 +3,80 @@ name: build and Deploy Code
 on: [push,pull_request]
 
 jobs:
-  # build:
-  #   environment:
-  #     name: testing
-  #   env:
-  #     DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
-  #     DATABASE_PORT: ${{secrets.DATABASE_PORT}}
-  #     DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-  #     DATABASE_NAME: ${{secrets.DATABASE_NAME}}
-  #     DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
-  #     SECRET_KEY: ${{secrets.SECRET_KEY}}
-  #     ALGORITHM: ${{secrets.ALGORITHM}}
-  #     ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
-
-  #   services:
-  #     postgres:
-  #       image: postgres
-  #       env:
-  #         POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-  #         POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
-  #       ports:
-  #         - 7878:5432
-  #       options: >-
-  #         --health-cmd pg_isready
-  #         --health-interval 10s
-  #         --health-timeout 5s
-  #         --health-retries 5
-
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: pulling git repo
-  #       uses: actions/checkout@v2
-  #     - name: sudo apt install python 3.10.6
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: "3.10.6"
-  #     - name: update pip
-  #       run: python -m pip install --upgrade pip
-  #     - name: install all dependencies
-  #       run: pip install -r requirement.txt
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v2
-  #       with:
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Set up Docker Buildx
-  #       uses: docker/setup-buildx-action@v2
-  #     - name: Build and push
-  #       uses: docker/build-push-action@v4
-  #       with:
-  #         context: .
-  #         file: ./Dockerfile
-  #         push: true
-  #         tags: ${{ secrets.DOCKERHUB_USERNAME }}/book-rental:latest
-  #     - name: test with pytest
-  #       run: |
-  #         pip install pytest
-  #         pytest
-
-  deploy:
-    # needs: build
+  build:
     environment:
-        name: deploy
+      name: testing
     env:
-        PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-        HOSTNAME : ${{ secrets.HOSTNAME  }}
-        USER_NAME : ${{ secrets.USER_NAME  }}
+      DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
+      DATABASE_PORT: ${{secrets.DATABASE_PORT}}
+      DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+      DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+      DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
+      SECRET_KEY: ${{secrets.SECRET_KEY}}
+      ALGORITHM: ${{secrets.ALGORITHM}}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+          POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
+        ports:
+          - 7878:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     runs-on: ubuntu-latest
     steps:
       - name: pulling git repo
-        uses: actions/checkout@v2 
-      - name: Deploy in EC2
-        
+        uses: actions/checkout@v2
+      - name: sudo apt install python 3.10.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10.6"
+      - name: update pip
+        run: python -m pip install --upgrade pip
+      - name: install all dependencies
+        run: pip install -r requirement.txt
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/book-rental:latest
+      - name: test with pytest
         run: |
-          echo ${PRIVATE_KEY} > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} '
+          pip install pytest
+          pytest
           
-            #Now we have got the access of EC2 and we will start the deploy .
-            cd /home/ubuntu/CounterApp &&
-            git pull origin main &&
-            sudo docker rm chiraggangwani/book-rental &&
-            sudo docker pull chiraggangwani/book-rental &&
-            sudo docker-compose -f up -d 
+  deploy:
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          name: id_rsa
+          known_hosts: ${{ secrets.HOSTNAME }}
+      - name: rsync over ssh
+        run: 
+          echo 'Starting to Deploy...'
+          ssh ${{ secrets.USER_NAME }}@${{ secrets.HOSTNAME }}
+          sudo docker-compose up -d
+          
