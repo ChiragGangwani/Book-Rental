@@ -29,8 +29,8 @@ app.include_router(review.router)
 app.include_router(cart.router)
 app.include_router(rental_history.router)
 
-app.get('/')
-def test():
+@app.get('/')
+async def test():
     return {"message": "Hello World pushing out to ubuntu"}
 
 
