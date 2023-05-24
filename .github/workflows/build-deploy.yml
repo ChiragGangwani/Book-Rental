@@ -75,5 +75,5 @@ jobs:
             username : ${{ secrets.EC2_USER_NAME  }}
             key: ${{ secrets.EC2_ACCESS_PRIVATE_KEY  }}
 
-        run: |
+        script: |
              cd BookRental
