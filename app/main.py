@@ -9,11 +9,6 @@ origins = ["*"]
 
 app = FastAPI()
 
-app.get('/')
-def test():
-    return "Hello World"
-
-
 
 scheduler.start()
 
@@ -33,6 +28,10 @@ app.include_router(genre.router)
 app.include_router(review.router)
 app.include_router(cart.router)
 app.include_router(rental_history.router)
+
+app.get('/')
+def test():
+    return {"message": "Hello World pushing out to ubuntu"}
 
 
 
