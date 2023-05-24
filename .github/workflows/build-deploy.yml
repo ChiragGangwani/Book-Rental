@@ -62,7 +62,6 @@ jobs:
           pytest
           
   deploy:
-    need: build
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v3
