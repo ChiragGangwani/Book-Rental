@@ -62,18 +62,13 @@ jobs:
   #         pytest
           
   deploy:
-    # needs: build
-    name: deploy
-    runs-on: ubuntu-latest
+
+    runs-on: self-hosted
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: rsync deployments
-        uses: burnett01/rsync-deployments@5.1
-        with:
-          switches: -avzr --delete
-          path: ./*
-          remote_path: /var/www/my-app/
-          remote_host: ec2-13-232-106-111.ap-south-1.compute.amazonaws.com
-          remote_user: ubuntu
-          remote_key: "${{ secrets.AWS_PRIVATE_KEY }}"
+    - uses: actions/checkout@v3
+    - name: install dependencies
+      run: pip install requirement.txt
+    - name: compose
+      run: sudo docker-compose down
+      run: sudo docker-compose up
