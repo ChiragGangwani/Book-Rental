@@ -3,66 +3,66 @@ name: build and Deploy Code
 on: [push,pull_request]
 
 jobs:
-  build:
-    environment:
-      name: testing
-    env:
-      DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
-      DATABASE_PORT: ${{secrets.DATABASE_PORT}}
-      DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-      DATABASE_NAME: ${{secrets.DATABASE_NAME}}
-      DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
-      SECRET_KEY: ${{secrets.SECRET_KEY}}
-      ALGORITHM: ${{secrets.ALGORITHM}}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
+  # build:
+  #   environment:
+  #     name: testing
+  #   env:
+  #     DATABASE_HOSTNAME: ${{secrets.DATABASE_HOSTNAME}}
+  #     DATABASE_PORT: ${{secrets.DATABASE_PORT}}
+  #     DATABASE_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+  #     DATABASE_NAME: ${{secrets.DATABASE_NAME}}
+  #     DATABASE_USERNAME: ${{secrets.DATABASE_USERNAME}}
+  #     SECRET_KEY: ${{secrets.SECRET_KEY}}
+  #     ALGORITHM: ${{secrets.ALGORITHM}}
+  #     ACCESS_TOKEN_EXPIRE_MINUTES: ${{secrets.ACCESS_TOKEN_EXPIRE_MINUTES}}
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
-          POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
-        ports:
-          - 7878:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+  #   services:
+  #     postgres:
+  #       image: postgres
+  #       env:
+  #         POSTGRES_PASSWORD: ${{secrets.DATABASE_PASSWORD}}
+  #         POSTGRES_DB: ${{secrets.DATABASE_NAME}}_test
+  #       ports:
+  #         - 7878:5432
+  #       options: >-
+  #         --health-cmd pg_isready
+  #         --health-interval 10s
+  #         --health-timeout 5s
+  #         --health-retries 5
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: pulling git repo
-        uses: actions/checkout@v2
-      - name: sudo apt install python 3.10.6
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.10.6"
-      - name: update pip
-        run: python -m pip install --upgrade pip
-      - name: install all dependencies
-        run: pip install -r requirement.txt
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/book-rental:latest
-      - name: test with pytest
-        run: |
-          pip install pytest
-          pytest
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: pulling git repo
+  #       uses: actions/checkout@v2
+  #     - name: sudo apt install python 3.10.6
+  #       uses: actions/setup-python@v2
+  #       with:
+  #         python-version: "3.10.6"
+  #     - name: update pip
+  #       run: python -m pip install --upgrade pip
+  #     - name: install all dependencies
+  #       run: pip install -r requirement.txt
+  #     - name: Login to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #     - name: Set up Docker Buildx
+  #       uses: docker/setup-buildx-action@v2
+  #     - name: Build and push
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         file: ./Dockerfile
+  #         push: true
+  #         tags: ${{ secrets.DOCKERHUB_USERNAME }}/book-rental:latest
+  #     - name: test with pytest
+  #       run: |
+  #         pip install pytest
+  #         pytest
           
   deploy:
-    needs: build
+    # needs: build
     environment:
       name: testing
     runs-on: self-hosted
