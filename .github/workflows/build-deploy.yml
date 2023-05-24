@@ -74,6 +74,7 @@ jobs:
     - name: docker pull
       run: |
             docker pull chiraggangwani/book-rental
+            cd
             cd Book-Rental
     - name: compose
       run: |
