@@ -76,4 +76,3 @@ jobs:
             key: ${{ secrets.EC2_ACCESS_PRIVATE_KEY  }}
             script: |
              cd BookRental
-
