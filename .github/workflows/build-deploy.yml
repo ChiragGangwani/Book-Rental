@@ -68,6 +68,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: install dependencies
+      run: cd Bood-Rental
       run: pip install requirement.txt
     - name: compose
       run: sudo docker-compose down
