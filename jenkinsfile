@@ -1,0 +1,29 @@
+pipeline {
+    agent any 
+    
+    environment {
+        USER_CRED=credentials('ac109e1a-b164-46ba-8539-b1c172578627')
+    }
+    
+    
+    stages {
+        stage('Checkout') { 
+            steps {
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ChiragGangwani/Book-Rental.git']])
+            }
+        }
+        stage('Build') { 
+            steps {
+                    sh 'echo $USER_CRED_PSW | sudo -E -S apt install pip -y'
+                    sh 'pip install -r requirement.txt'
+                }
+        }
+        stage('Testing') { 
+            steps {
+                    sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose up -d'
+                    sh 'python3 -m pytest'
+                    sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose down'
+                }
+        }
+    }
+}
