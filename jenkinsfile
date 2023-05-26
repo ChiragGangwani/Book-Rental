@@ -31,20 +31,19 @@ pipeline {
                     sh 'pip install -r requirement.txt'
                 }
         }
-        stage('Build & push docker image') { 
+        stage('Build docker image') { 
             steps {
                     script{
                             sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'                		
 	                        echo 'Login Completed'      
                         }
                             sh 'docker build -t chiraggangwani/book-rental .'
-                            sh 'docker push chiraggangwani/book-rental'
                     }
                 }
-        }
-        stage('Trivy') { 
+        stage('Trivy and push docker image') { 
             steps {
                     sh 'trivy image chiraggangwani/book-rental'
+                    sh 'docker push chiraggangwani/book-rental'
                 }
         }
         stage('Testing') { 
@@ -56,3 +55,4 @@ pipeline {
         }
         
     }
+}    
