@@ -20,8 +20,8 @@ pipeline {
 
         stage('OWASP Dependency') { 
             steps {
-                    dependencyCheck additionalArgument: '--scan ./', odcInstallation: 'DP'
-                    dependencyCheckPublisher patter: '**/dependency-check-report.xml'
+                    dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
                 }
         }
         stage('Build') { 
