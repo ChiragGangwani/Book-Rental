@@ -79,4 +79,4 @@ jobs:
             cd Book-Rental
     - name: compose
       run: |
-            sudo docker-compose up -d
+            sudo docker-compose up -d 
