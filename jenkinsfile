@@ -33,10 +33,8 @@ pipeline {
         }
         stage('Build docker image') { 
             steps {
-                    script{
-                            sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'                		
-	                        echo 'Login Completed'      
-                        }
+                    withCredentials([usernamePassword(credentialsId: 'dockercredidentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
                             sh 'docker build -t chiraggangwani/book-rental .'
                     }
                 }
