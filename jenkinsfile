@@ -41,7 +41,7 @@ pipeline {
         }
         stage('Trivy and push docker image') { 
             steps {
-                    sh 'trivy image chiraggangwani/book-rental'
+                    sh 'echo $USER_CRED_PSW | sudo -E -S trivy image chiraggangwani/book-rental'
                     // sh "echo $USER_CRED_PSW | sudo -E -S docker push chiraggangwani/book-rental"
                 }
         }
