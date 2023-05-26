@@ -6,6 +6,7 @@ pipeline {
     environment {
         USER_CRED=credentials('ac109e1a-b164-46ba-8539-b1c172578627')
         SCANNER_HOME=tool'sonar-scanner'
+        DOCKERHUB_CREDENTIALS= credentials('dockerhubcredentials')
     }
     
     
@@ -33,10 +34,11 @@ pipeline {
         stage('Build & push docker image') { 
             steps {
                     script{
-                        withDockerRegistry(credentialsId: '00e93adb-3368-4a3f-89ac-be6b02a72287', toolName: 'Docker') {
+                            sh 'echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'                		
+	                        echo 'Login Completed'      
+                        }
                             sh 'docker build -t chiraggangwani/book-rental .'
                             sh 'docker push chiraggangwani/book-rental'
-                        }
                     }
                 }
         }
@@ -54,4 +56,3 @@ pipeline {
         }
         
     }
-}
