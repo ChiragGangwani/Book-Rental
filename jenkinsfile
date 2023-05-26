@@ -19,12 +19,12 @@ pipeline {
                 }
         }
 
-        stage('OWASP Dependency') { 
-            steps {
-                    dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                }
-        }
+        // stage('OWASP Dependency') { 
+        //     steps {
+        //             dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'DP'
+        //             dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //         }
+        // }
         stage('Build') { 
             steps {
                     sh 'echo $USER_CRED_PSW | sudo -E -S apt install pip -y'
@@ -41,7 +41,7 @@ pipeline {
         }
         stage('Trivy and push docker image') { 
             steps {
-                    // sh 'echo $USER_CRED_PSW | sudo -E -S trivy image chiraggangwani/book-rental'
+                    sh 'echo $USER_CRED_PSW | sudo -E -S trivy image chiraggangwani/book-rental'
                     sh "echo $USER_CRED_PSW | sudo -E -S docker push chiraggangwani/book-rental"
                 }
         }
