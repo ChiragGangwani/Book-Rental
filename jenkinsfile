@@ -1,21 +1,48 @@
 pipeline {
     agent any 
-    
+    tools{
+        maven 'maven3'
+    }
     environment {
         USER_CRED=credentials('ac109e1a-b164-46ba-8539-b1c172578627')
+        SCANNER_HOME=tool'sonar-scanner'
     }
     
     
     stages {
-        stage('Checkout') { 
+        stage('sonarqube analysis') { 
             steps {
-                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/ChiragGangwani/Book-Rental.git']])
-            }
+                    sh ''' &SCANNER_HOME/bin/sonar-scanner -Dsonar.url=http://127.0.0.1:9000/ -Dsonar.login=squ_af1cf2952c6a12fa277e774f31d9645b663703ab -Dsonar.projectName=book-rental \
+                            -Dsonar.java.binaries=. \
+                            -Dsonar.projectKey=book-rental '''
+                }
+        }
+
+        stage('OWASP Dependency') { 
+            steps {
+                    dependencyCheck additionalArgument: '--scan ./', odcInstallation: 'DP'
+                    dependencyCheckPublisher patter: '**/dependency-check-report.xml'
+                }
         }
         stage('Build') { 
             steps {
                     sh 'echo $USER_CRED_PSW | sudo -E -S apt install pip -y'
                     sh 'pip install -r requirement.txt'
+                }
+        }
+        stage('Build & push docker image') { 
+            steps {
+                    script{
+                        withDockerRegistry(credentialsId: '00e93adb-3368-4a3f-89ac-be6b02a72287', toolName: 'Docker') {
+                            sh 'docker build -t chiraggangwani/book-rental .'
+                            sh 'docker push chiraggangwani/book-rental'
+                        }
+                    }
+                }
+        }
+        stage('Trivy') { 
+            steps {
+                    sh 'trivy image chiraggangwani/book-rental'
                 }
         }
         stage('Testing') { 
@@ -25,5 +52,6 @@ pipeline {
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose down'
                 }
         }
+        
     }
 }
