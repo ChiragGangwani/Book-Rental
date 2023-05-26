@@ -33,11 +33,12 @@ pipeline {
         }
         stage('Build docker image') { 
             steps {
-                    withCredentials([usernamePassword(credentialsId: 'dockercredidentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-                            sh 'docker build -t chiraggangwani/book-rental .'
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhubcredentials', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	        sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                    sh 'docker build -t chiraggangwani/book-rental .'
                 }
+            }
+        }
         stage('Trivy and push docker image') { 
             steps {
                     sh 'trivy image chiraggangwani/book-rental'
