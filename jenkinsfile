@@ -63,7 +63,6 @@ pipeline {
                     sh 'pip install -r requirement.txt'
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker pull chiraggangwani/book-rental'
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose up -d'
-                    sh 'alembic upgrade head'
             }
         }
         
