@@ -52,6 +52,16 @@ pipeline {
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose down'
                 }
         }
+        stage('deploy'){
+            agent{
+                label 'aws'
+            }
+            steps {
+                    sh 'alembic upgrade head'
+                    sh 'echo $USER_CRED_PSW | sudo -E -S docker pull chiraggangwani/book-rental'
+                    sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose up -d'
+            }
+        }
         
     }
 }
