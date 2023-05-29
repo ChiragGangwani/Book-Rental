@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('sonarqube analysis') { 
             steps {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.url=http://127.0.0.1:9000/ -Dsonar.login=squ_af1cf2952c6a12fa277e774f31d9645b663703ab -Dsonar.projectName=book-rental \
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.url=http://127.0.0.1:9000/ -Dsonar.login=squ_35cc76a4ac0f46feff6bacccf2613c46f82c0749 -Dsonar.projectName=book-rental \
                             -Dsonar.java.binaries=. \
                             -Dsonar.projectKey=book-rental '''
                 }
