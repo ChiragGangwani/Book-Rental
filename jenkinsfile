@@ -57,6 +57,8 @@ pipeline {
                 label 'aws'
             }
             steps {
+                    sh 'cd'
+                    sh 'cd /home/ubuntu/workspace/build'
                     sh 'alembic upgrade head'
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker pull chiraggangwani/book-rental'
                     sh 'echo $USER_CRED_PSW | sudo -E -S docker-compose up -d'
